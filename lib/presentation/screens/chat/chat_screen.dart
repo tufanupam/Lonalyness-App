@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'dart:ui';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/extensions.dart';
 import '../../../domain/entities/message_entity.dart';
@@ -266,7 +267,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     style: AppTheme.textTheme.bodyMedium?.copyWith(color: Colors.white),
                     decoration: InputDecoration(
                       hintText: 'Type a message...',
-                      hintStyle: AppTheme.textTheme.bodyMedium?.copyWith(color: AppTheme.textSub),
+                      hintStyle: AppTheme.textTheme.bodyMedium?.copyWith(color: AppTheme.textMuted),
                       border: InputBorder.none,
                       contentPadding:
                           const EdgeInsets.symmetric(horizontal: 20, vertical: 12),

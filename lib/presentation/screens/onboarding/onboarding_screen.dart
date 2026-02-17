@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:ui';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/app_theme.dart';
 
@@ -25,28 +26,30 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           Positioned(
             top: -100,
             right: -100,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppTheme.deepPurple.withOpacity(0.2),
-                filter:
-                    ImageFilter.blur(sigmaX: 80, sigmaY: 80), // Glassmorphism glow
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppTheme.deepPurple.withOpacity(0.2),
+                ),
               ),
             ),
           ),
            Positioned(
             bottom: -50,
             left: -50,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppTheme.accentPink.withOpacity(0.15),
-                filter:
-                    ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppTheme.accentPink.withOpacity(0.15),
+                ),
               ),
             ),
           ),

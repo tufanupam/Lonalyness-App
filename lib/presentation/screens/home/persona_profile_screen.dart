@@ -168,7 +168,7 @@ class PersonaProfileScreen extends ConsumerWidget {
                         context,
                         icon: Icons.videocam_rounded,
                         label: 'Video',
-                        color: AppTheme.secondary,
+                        color: AppTheme.accentCrux,
                         onTap: () =>
                             context.push('/video-call/$personaId'),
                       ),

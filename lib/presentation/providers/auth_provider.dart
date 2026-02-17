@@ -94,6 +94,19 @@ class CurrentUserNotifier extends StateNotifier<AsyncValue<UserEntity?>> {
     }
   }
 
+  /// Sign in as Guest (Demo).
+  Future<void> signInAsGuest() async {
+    state = const AsyncValue.loading();
+    try {
+      final repo = _ref.read(authRepositoryProvider);
+      final user = await repo.signInAsGuest();
+      state = AsyncValue.data(user);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
   /// Sign out.
   Future<void> signOut() async {
     final repo = _ref.read(authRepositoryProvider);

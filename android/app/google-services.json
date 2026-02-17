@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "579518596472",
+    "project_id": "ai-muse-app",
+    "storage_bucket": "ai-muse-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:579518596472:android:989e41111538150755348d",
+        "android_client_info": {
+          "package_name": "com.aimuse.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2tGNLxSV6oBMy03NBOEzvf_0oXTyRH7c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

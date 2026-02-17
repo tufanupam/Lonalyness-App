@@ -34,28 +34,59 @@ class AppRoutes {
   static const String subscription = '/subscription';
 }
 
+/// Notifier that listens to auth changes and triggers GoRouter refresh.
+class AuthChangeNotifier extends ChangeNotifier {
+  AuthChangeNotifier(Ref ref) {
+    // Listen to currentUserProvider (handles both Firebase and Guest auth)
+    ref.listen(currentUserProvider, (_, __) {
+      notifyListeners();
+    });
+    ref.listen(authStateProvider, (_, __) {
+      notifyListeners();
+    });
+  }
+}
+
+/// Provider for the auth change notifier.
+final authChangeNotifierProvider = Provider<AuthChangeNotifier>((ref) {
+  return AuthChangeNotifier(ref);
+});
+
 /// GoRouter provider with auth redirect logic.
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authStateProvider);
+  final authNotifier = ref.watch(authChangeNotifierProvider);
 
   return GoRouter(
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
+    refreshListenable: authNotifier,
 
     // Redirect unauthenticated users to login
     redirect: (context, state) {
-      final isLoggedIn = authState.valueOrNull != null;
-      final isPublicRoute = state.matchedLocation == AppRoutes.splash ||
-          state.matchedLocation == AppRoutes.onboarding ||
-          state.matchedLocation == AppRoutes.login ||
-          state.matchedLocation == AppRoutes.signup;
+      final authState = ref.read(authStateProvider);
+      final currentUser = ref.read(currentUserProvider);
 
-      if (!isLoggedIn && !isPublicRoute) return AppRoutes.login;
-      
-      // Optional: If logged in and on public auth/onboarding routes, redirect to home?
-      // Keeping it simple for now to allow viewing the flow.
-      // if (isLoggedIn && (state.matchedLocation == AppRoutes.login || state.matchedLocation == AppRoutes.signup)) return AppRoutes.home;
-      
+      // Check both Firebase auth AND local guest/demo user
+      final isFirebaseLoggedIn = authState.valueOrNull != null;
+      final isGuestLoggedIn = currentUser.valueOrNull != null;
+      final isLoggedIn = isFirebaseLoggedIn || isGuestLoggedIn;
+
+      final currentPath = state.matchedLocation;
+      final isPublicRoute = currentPath == AppRoutes.splash ||
+          currentPath == AppRoutes.onboarding ||
+          currentPath == AppRoutes.login ||
+          currentPath == AppRoutes.signup;
+
+      // If logged in and on login/signup, redirect to home
+      if (isLoggedIn && (currentPath == AppRoutes.login || currentPath == AppRoutes.signup)) {
+        return AppRoutes.home;
+      }
+
+      // If not logged in and trying to access protected route, go to login
+      if (!isLoggedIn && !isPublicRoute) {
+        return AppRoutes.login;
+      }
+
       return null;
     },
 

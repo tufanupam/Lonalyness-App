@@ -58,6 +58,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  Future<void> _handleGuestLogin() async {
+    setState(() => _isLoading = true);
+    try {
+      await ref.read(currentUserProvider.notifier).signInAsGuest();
+      if (mounted) context.go(AppRoutes.home);
+    } catch (e) {
+      if (mounted) context.showSnackBar(e.toString(), isError: true);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,6 +113,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 // ── Sign Up Link ─────────────────────────────────
                 _buildSignUpLink(),
+                const SizedBox(height: 24),
+
+                // ── Guest Mode ───────────────────────────────────
+                _buildGuestButton(),
                 const SizedBox(height: 40),
               ],
             ),
@@ -286,5 +302,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
       ],
     ).animate().fadeIn(delay: 1100.ms);
+  }
+
+  Widget _buildGuestButton() {
+    return TextButton(
+      onPressed: _isLoading ? null : _handleGuestLogin,
+      child: Text(
+        'Try Demo (Guest Mode)',
+        style: AppTheme.textTheme.bodyMedium?.copyWith(
+          color: AppTheme.textMuted,
+          decoration: TextDecoration.underline,
+        ),
+      ),
+    ).animate().fadeIn(delay: 1200.ms);
   }
 }

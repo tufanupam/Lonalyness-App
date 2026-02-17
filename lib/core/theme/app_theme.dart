@@ -169,4 +169,16 @@ class AppTheme {
   static const Color success = Color(0xFF32D74B); // iOS Green
   static const Color warning = accentLuxe;
   static const Color accent = white;           // Primary accent is white/titanium
+  
+  // Radius
+  static const double radiusMd = 12.0;
+  static const double radiusLg = 16.0;
+  static const double radiusXl = 24.0;
+  static const double radiusFull = 100.0;
+
+  static const LinearGradient primaryGradient = LinearGradient(
+    colors: [accentCrux, Color(0xFF00C7BE)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 }

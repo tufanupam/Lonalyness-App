@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -156,9 +157,7 @@ class _VoiceCallScreenState extends ConsumerState<VoiceCallScreen>
                              // Random-ish smooth movement
                              double noise = (index % 3 == 0) ? 0.5 : 1.0;
                              double height = 4 + 16 * 
-                               (0.5 + 0.5 * (
-                                 _waveformController.value * 6.28 + index
-                               ).sin()) * noise;
+                               (0.5 + 0.5 * sin(_waveformController.value * 6.28 + index)) * noise;
                              return Container(
                                width: 4,
                                height: height,

@@ -130,10 +130,10 @@ class ProfileScreen extends ConsumerWidget {
                       AppTheme.accent),
                   const SizedBox(width: 12),
                   _buildStatCard(context, 'XP', '${user?.totalXp ?? 0}',
-                      AppTheme.secondary),
+                      AppTheme.accentLuxe),
                   const SizedBox(width: 12),
                   _buildStatCard(context, 'Badges',
-                      '${user?.badges.length ?? 0}', AppTheme.tertiary),
+                      '${user?.badges.length ?? 0}', AppTheme.accentRose),
                 ],
               ).animate().fadeIn(delay: 500.ms),
 
@@ -153,7 +153,7 @@ class ProfileScreen extends ConsumerWidget {
                 icon: Icons.language,
                 title: 'Language',
                 subtitle: user?.preferredLanguage?.toUpperCase() ?? 'EN',
-                color: AppTheme.secondary,
+                color: AppTheme.accentCrux,
                 onTap: () {},
               ),
               _buildMenuItem(
