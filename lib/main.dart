@@ -10,6 +10,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'app.dart';
 
+import 'core/config/app_config.dart';
+
 Future<void> main() async {
   // Ensure Flutter framework is initialized
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,8 +41,9 @@ Future<void> main() async {
     );
     isFirebaseAvailable = true;
     debugPrint("✅ Firebase initialized successfully");
-  } catch (e) {
+  } catch (e, stack) {
     debugPrint("⚠️ Firebase initialization failed: $e");
+    debugPrint("Stack trace: $stack");
     // Continue running in Offline/Demo mode
   }
 
@@ -53,6 +56,3 @@ Future<void> main() async {
     ),
   );
 }
-
-/// Global flag to check if Firebase is available.
-bool isFirebaseAvailable = false;

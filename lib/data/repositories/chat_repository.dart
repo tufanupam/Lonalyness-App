@@ -6,13 +6,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:http/http.dart' as http;
+import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:uuid/uuid.dart';
 import '../../core/constants/api_constants.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/entities/persona_entity.dart';
 import '../../domain/entities/memory_entity.dart';
-import '../../main.dart'; // for isFirebaseAvailable
+import '../../core/config/app_config.dart';
 
 /// Repository for chat operations and AI interactions.
 class ChatRepository {
@@ -27,6 +27,16 @@ class ChatRepository {
   // ─── Local / Offline Storage ───────────────────────────────────────────────
   final Map<String, List<MessageEntity>> _localMessages = {};
   final Map<String, StreamController<List<MessageEntity>>> _localStreams = {};
+
+  // ─── Gemini AI Configuration ──────────────────────────────────────────────
+  late final GenerativeModel _model;
+  
+  ChatRepository() {
+    _model = GenerativeModel(
+      model: 'gemini-1.5-flash',
+      apiKey: ApiConstants.geminiApiKey,
+    );
+  }
 
   /// Get chat messages stream for a user-persona pair.
   Stream<List<MessageEntity>> getMessages(String userId, String personaId) {
@@ -66,51 +76,64 @@ class ChatRepository {
     // 1. Save User Message
     await _saveMessage(userMessage);
 
-    // 2. Decide: API or Local Simulation
-    // If we have no API key (assumed for demo) or no network, usage local.
-    // For this 'Realistic' demo, we default to local engine if API fails or is not config.
-    bool useApi = isFirebaseAvailable; // Simplified check. Ideally check API Key availability.
+    // 2. Prepare Context (System Prompt + History)
+    final systemPrompt = _buildSystemPrompt(persona, memories);
     
     try {
-      if (useApi) {
-        yield* _streamFromApi(userId, userMessage, persona, chatHistory, memories);
-      } else {
-        throw Exception("Offline mode");
+      if (ApiConstants.geminiApiKey == 'REPLACE_WITH_YOUR_GEMINI_API_KEY') {
+        throw Exception("Gemini API Key missing");
       }
-    } catch (_) {
-      // Fallback to Local AI Engine (The "Realistic" Simulation)
+
+      final chat = _model.startChat(
+        history: _buildGeminiHistory(chatHistory),
+      );
+
+      final response = chat.sendMessageStream(Content.text(userMessage.content));
+      
+      final buffer = StringBuffer();
+      await for (final chunk in response) {
+        if (chunk.text != null) {
+          buffer.write(chunk.text);
+          yield buffer.toString();
+        }
+      }
+
+      // Save full response
+      final aiMessage = MessageEntity(
+        id: _uuid.v4(),
+        personaId: userMessage.personaId,
+        userId: userId,
+        role: MessageRole.assistant,
+        content: buffer.toString(),
+        timestamp: DateTime.now(),
+      );
+      await _saveMessage(aiMessage);
+
+    } catch (e) {
+      // Fallback to Local AI Engine on failure or missing API key
       yield* _streamFromLocalEngine(userId, userMessage, persona);
     }
   }
 
-  // ─── API Implementation ────────────────────────────────────────────────────
-  
-  Stream<String> _streamFromApi(
-    String userId,
-    MessageEntity userMessage,
-    PersonaEntity persona,
-    List<MessageEntity> chatHistory,
-    List<MemoryEntity> memories,
-  ) async* {
-    final client = http.Client();
-    final buffer = StringBuffer();
-
-    try {
-      final messages = _buildApiMessages(persona, chatHistory, memories);
-      
-      final request = http.Request(
-        'POST',
-        Uri.parse('${ApiConstants.baseUrl}${ApiConstants.chatEndpoint}'),
-      );
-      // ... headers setup (omitted for brevity as we likely fall back) ...
-      
-      // Simulating API failure for demo purpose since we don't have keys
-      throw Exception("API Key missing"); 
-
-    } finally {
-      client.close();
-      // On failure, we don't yield anything here, allowing the catch block in sendMessage to handle fallback
+  String _buildSystemPrompt(PersonaEntity persona, List<MemoryEntity> memories) {
+    String prompt = persona.systemPrompt;
+    if (memories.isNotEmpty) {
+      prompt += "\n\nYou have these memories with the user:\n";
+      for (var m in memories) {
+        prompt += "- ${m.content}\n";
+      }
     }
+    return prompt;
+  }
+
+  List<Content> _buildGeminiHistory(List<MessageEntity> history) {
+    return history.map((m) {
+      if (m.role == MessageRole.user) {
+        return Content.text(m.content);
+      } else {
+        return Content.model([TextPart(m.content)]);
+      }
+    }).toList();
   }
 
   // ─── Local AI Engine (The "Realistic" Simulation) ──────────────────────────

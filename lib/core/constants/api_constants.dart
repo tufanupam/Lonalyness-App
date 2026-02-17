@@ -12,6 +12,10 @@ class ApiConstants {
   /// OpenAI-compatible API endpoint for chat completions.
   static const String chatEndpoint = '/api/chat';
 
+  /// Gemini API Key
+  /// TODO: Replace with your actual Gemini API Key or use environment variables.
+  static const String geminiApiKey = 'REPLACE_WITH_YOUR_GEMINI_API_KEY';
+
   /// Translation endpoint.
   static const String translateEndpoint = '/api/translate';
 

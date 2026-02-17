@@ -1,7 +1,4 @@
-/// AI Muse — Subscription Screen
-/// Premium subscription plans with feature comparison and purchase flow.
-library;
-
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -24,277 +21,298 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          icon: const Icon(Icons.close_rounded, size: 24, color: Colors.white),
           onPressed: () => context.pop(),
         ),
-        title: const Text('Premium'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-
-            // ── Header ─────────────────────────────────────────
-            Container(
-              width: 72,
-              height: 72,
+      body: Stack(
+        children: [
+          // ── Ambient Background Glows ──────────────────────
+          Positioned(
+            top: -200,
+            left: -100,
+            child: Container(
+              width: 500,
+              height: 500,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFFFD740), Color(0xFFFF9100)],
+                color: AppTheme.accentLuxe.withOpacity(0.15),
+                filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
+              ),
+            ),
+          ),
+          
+          SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              children: [
+                const SizedBox(height: 80),
+
+                // ── Header Icon ─────────────────────────────────────
+                Center(
+                  child: Container(
+                    width: 88,
+                    height: 88,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFFFD740), Color(0xFFFFAB00)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.accentLuxe.withOpacity(0.5),
+                          blurRadius: 40,
+                          spreadRadius: 5,
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.star_rounded,
+                      color: Colors.white,
+                      size: 48,
+                    ),
+                  ).animate().scale(
+                        begin: const Offset(0.5, 0.5),
+                        duration: 800.ms,
+                        curve: Curves.elasticOut,
+                      ).shimmer(duration: 2.seconds, delay: 1.seconds),
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.warning.withValues(alpha: 0.4),
-                    blurRadius: 20,
-                    spreadRadius: 2,
+
+                const SizedBox(height: 32),
+
+                // ── Title & Subtitle ──────────────────────────────
+                ShaderMask(
+                  shaderCallback: (bounds) => const LinearGradient(
+                    colors: [Color(0xFFFFD740), Colors.white],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ).createShader(bounds),
+                  child: Text(
+                    'Unlock AI Muse Premium',
+                    textAlign: TextAlign.center,
+                    style: AppTheme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: -0.5,
+                      height: 1.1,
+                    ),
                   ),
-                ],
-              ),
-              child: const Icon(
-                Icons.workspace_premium,
-                color: Colors.white,
-                size: 36,
-              ),
-            ).animate().scale(
-                  begin: const Offset(0.5, 0.5),
-                  duration: 600.ms,
-                  curve: Curves.elasticOut,
-                ),
+                ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.1),
 
-            const SizedBox(height: 20),
-            Text('Unlock AI Muse Premium',
-                    style: context.textTheme.headlineMedium)
-                .animate()
-                .fadeIn(delay: 200.ms),
-            const SizedBox(height: 8),
-            Text(
-              'Get unlimited access to all personas, voice & video calls, and exclusive content.',
-              textAlign: TextAlign.center,
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: AppTheme.textSecondary,
-                height: 1.5,
-              ),
-            ).animate().fadeIn(delay: 300.ms),
+                const SizedBox(height: 16),
+                
+                Text(
+                  'Experience uncensored, immersive conversations with advanced emotional intelligence.',
+                  textAlign: TextAlign.center,
+                  style: AppTheme.textTheme.bodyLarge?.copyWith(
+                    color: AppTheme.silver,
+                    height: 1.5,
+                  ),
+                ).animate().fadeIn(delay: 300.ms),
 
-            const SizedBox(height: 28),
+                const SizedBox(height: 48),
 
-            // ── Billing Toggle ─────────────────────────────────
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceLight,
-                borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-                border: Border.all(color: AppTheme.divider),
-              ),
-              child: Row(
-                children: [
-                  _buildToggle('Monthly', !_isYearly, () {
-                    setState(() => _isYearly = false);
-                  }),
-                  _buildToggle('Yearly (-33%)', _isYearly, () {
-                    setState(() => _isYearly = true);
-                  }),
-                ],
-              ),
-            ).animate().fadeIn(delay: 400.ms),
+                // ── Billing Toggle ─────────────────────────────────
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildToggle('Monthly', !_isYearly, () => setState(() => _isYearly = false)),
+                      _buildToggle('Yearly (-33%)', _isYearly, () => setState(() => _isYearly = true)),
+                    ],
+                  ),
+                ).animate().fadeIn(delay: 400.ms),
 
-            const SizedBox(height: 24),
+                const SizedBox(height: 32),
 
-            // ── Plan Cards ─────────────────────────────────────
-            ...SubscriptionRepository.plans.map((plan) {
-              final isPremium = plan.id == 'premium';
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: _buildPlanCard(context, plan, isPremium),
-              )
-                  .animate()
-                  .fadeIn(delay: (500 + (isPremium ? 150 : 0)).ms)
-                  .slideY(begin: 0.1);
-            }),
+                // ── Premium Card ───────────────────────────────────
+                _buildPremiumCard().animate().fadeIn(delay: 500.ms).slideY(begin: 0.1),
 
-            const SizedBox(height: 16),
+                const SizedBox(height: 32),
 
-            // ── Terms ──────────────────────────────────────────
-            Text(
-              'Cancel anytime. Payment will be charged through your app store account.',
-              textAlign: TextAlign.center,
-              style: context.textTheme.bodySmall?.copyWith(
-                color: AppTheme.textMuted,
-              ),
-            ).animate().fadeIn(delay: 800.ms),
+                // ── Terms ──────────────────────────────────────────
+                Text(
+                  'Recurring billing. Cancel anytime.\nTerms of Service & Privacy Policy',
+                  textAlign: TextAlign.center,
+                  style: AppTheme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textMuted,
+                    height: 1.6,
+                  ),
+                ).animate().fadeIn(delay: 800.ms),
 
-            const SizedBox(height: 40),
-          ],
-        ),
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildToggle(String label, bool isActive, VoidCallback onTap) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: isActive ? AppTheme.accent : Colors.transparent,
-            borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: isActive ? Colors.white : AppTheme.textMuted,
-              ),
-            ),
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 24),
+        decoration: BoxDecoration(
+          color: isActive ? AppTheme.accentLuxe : Colors.transparent,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: isActive ? [
+            BoxShadow(color: AppTheme.accentLuxe.withOpacity(0.3), blurRadius: 8),
+          ] : null,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: isActive ? Colors.black : AppTheme.textGrey,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildPlanCard(
-      BuildContext context, SubscriptionPlan plan, bool isPremium) {
+  Widget _buildPremiumCard() {
+    final plan = SubscriptionRepository.plans.firstWhere((p) => p.id == 'premium'); // Get Premium Plan
     final price = _isYearly ? plan.priceYearly : plan.priceMonthly;
     final period = _isYearly ? '/year' : '/month';
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      width: double.infinity,
+      padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        gradient: isPremium
-            ? const LinearGradient(
-                colors: [Color(0xFF1A1A3E), Color(0xFF2D1B69)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : null,
-        color: isPremium ? null : AppTheme.surfaceLight,
-        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-        border: Border.all(
-          color: isPremium ? AppTheme.accent : AppTheme.divider,
-          width: isPremium ? 2 : 1,
+        gradient: const LinearGradient(
+          colors: [Color(0xFF2A2A2E), Color(0xFF141414)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        boxShadow: isPremium
-            ? [
-                BoxShadow(
-                  color: AppTheme.accent.withValues(alpha: 0.2),
-                  blurRadius: 20,
-                  spreadRadius: 2,
-                ),
-              ]
-            : null,
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(
+          color: AppTheme.accentLuxe.withOpacity(0.3),
+           width: 1.5
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.5),
+            blurRadius: 20,
+            spreadRadius: 2,
+          ),
+        ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Plan header
-          Row(
-            children: [
-              Text(plan.name, style: context.textTheme.headlineMedium),
-              const Spacer(),
-              if (isPremium)
+          // Features List
+          ...plan.features.map((f) => Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Row(
+              children: [
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFFFD740), Color(0xFFFF9100)],
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Text(
-                    'POPULAR',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.black,
+                  padding: const EdgeInsets.all(4),
+                   decoration: BoxDecoration(
+                     color: AppTheme.accentLuxe.withOpacity(0.1),
+                     shape: BoxShape.circle,
+                   ),
+                  child: const Icon(Icons.check, size: 14, color: AppTheme.accentLuxe)
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    f,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
-            ],
-          ),
-          const SizedBox(height: 8),
+              ],
+            ),
+          )),
+
+          const SizedBox(height: 24),
+          const Divider(color: Colors.white12),
+          const SizedBox(height: 24),
+
           // Price
           Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
-                price == 0 ? 'Free' : '\$${price.toStringAsFixed(2)}',
-                style: context.textTheme.displayMedium?.copyWith(
-                  color: isPremium ? AppTheme.accent : AppTheme.textPrimary,
+                '\$${price.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: -1,
                 ),
               ),
-              if (price > 0)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 6, left: 4),
-                  child: Text(
-                    period,
-                    style: context.textTheme.bodySmall,
-                  ),
+              Text(
+                period,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: AppTheme.textGrey,
+                  fontWeight: FontWeight.w500,
                 ),
+              ),
             ],
           ),
-          const SizedBox(height: 16),
-          // Features
-          ...plan.features.map((f) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.check_circle,
-                      size: 18,
-                      color:
-                          isPremium ? AppTheme.accent : AppTheme.textMuted,
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      f,
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        color: isPremium
-                            ? AppTheme.textPrimary
-                            : AppTheme.textSecondary,
-                      ),
-                    ),
-                  ],
+
+          const SizedBox(height: 24),
+
+          // CTA Button
+          GestureDetector(
+            onTap: () {
+               ScaffoldMessenger.of(context).showSnackBar(
+                 const SnackBar(content: Text("Payment integration coming soon!"))
+               );
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 18),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFFFD740), Color(0xFFFF9100)],
                 ),
-              )),
-          const SizedBox(height: 16),
-          // CTA
-          SizedBox(
-            width: double.infinity,
-            child: isPremium
-                ? ElevatedButton(
-                    onPressed: () {
-                      // TODO: Implement Stripe/Razorpay payment
-                      context.showSnackBar(
-                          'Payment integration coming soon!');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    child: const Text('Get Premium'),
-                  )
-                : OutlinedButton(
-                    onPressed: () => context.pop(),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    child: const Text('Current Plan'),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.accentLuxe.withOpacity(0.4),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
                   ),
-          ),
+                ],
+              ),
+              child: const Center(
+                child: Text(
+                  "Continue",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(delay: 2.seconds, duration: 1500.ms),
         ],
       ),
     );

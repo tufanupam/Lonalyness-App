@@ -18,7 +18,7 @@ void main() {
         personaId: 'aria',
         userId: 'test_user',
         role: MessageRole.user,
-        content: 'Hello, are you real?',
+        content: 'Are you real?',
         timestamp: DateTime.now(),
       );
 

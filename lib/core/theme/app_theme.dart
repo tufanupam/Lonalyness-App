@@ -10,10 +10,11 @@ class AppTheme {
   static const Color platinum = Color(0xFFE5E5EA);       // Bright Metal
   static const Color white = Color(0xFFFFFFFF);
   
-  // Accents are subtle, not neon
-  static const Color accentCrux = Color(0xFF0A84FF);     // Deep Electric Blue (iOS style)
-  static const Color accentLuxe = Color(0xFFFFD60A);     // Gold/Amber (Premium)
-  static const Color accentRose = Color(0xFFFF375F);     // Deep Rose
+  // Accents - Neon & Premium
+  static const Color accentCrux = Color(0xFF7C4DFF);     // Deep Purple (Neon)
+  static const Color accentLuxe = Color(0xFFFFD740);     // Gold/Amber (Premium)
+  static const Color accentRose = Color(0xFFFF4081);     // Soft Pink (Neon)
+  static const Color accentCyan = Color(0xFF00E5FF);     // Cyan (Futuristic)
 
   static const LinearGradient premiumGradient = LinearGradient(
     colors: [Color(0xFF2C2C2E), Color(0xFF000000)], // Subtle metal gradient
@@ -25,6 +26,12 @@ class AppTheme {
     colors: [Colors.white10, Colors.transparent],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
+  );
+  
+  static const LinearGradient accentGradient = LinearGradient(
+    colors: [accentCrux, accentRose],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
   );
 
   // ── Typography ───────────────────────────────────────────
@@ -73,6 +80,12 @@ class AppTheme {
       color: white,
       letterSpacing: 0.5,
     ),
+    bodySmall: GoogleFonts.inter(
+      fontSize: 12,
+      fontWeight: FontWeight.w400,
+      color: silver,
+      height: 1.4,
+    ),
   );
 
   // ── Theme Data ───────────────────────────────────────────
@@ -84,13 +97,13 @@ class AppTheme {
       primaryColor: primaryBlack,
       
       colorScheme: const ColorScheme.dark(
-        primary: white,           // High contrast
-        onPrimary: primaryBlack,
-        secondary: titanium,
+        primary: accentCrux,      // Main accent
+        onPrimary: white,
+        secondary: accentRose,
         onSecondary: white,
         surface: titanium,
         onSurface: white,
-        error: accentRose,
+        error: Color(0xFFFF3B30),
       ),
 
       // AppBar
@@ -105,8 +118,8 @@ class AppTheme {
       // Buttons
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: white,
-          foregroundColor: primaryBlack,
+          backgroundColor: accentCrux,
+          foregroundColor: white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(
@@ -142,14 +155,14 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: white),
+          borderSide: const BorderSide(color: accentCrux),
         ),
         hintStyle: textTheme.bodyMedium,
       ),
     );
   }
   
-  // Shortcuts for common colors (legacy support + new)
+  // Shortcuts for common colors
   static const Color textPrimary = white;
   static const Color textSecondary = silver;
   static const Color textMuted = Color(0xFF636366);
@@ -157,18 +170,19 @@ class AppTheme {
   static const Color surfaceLight = Color(0xFF2C2C2E);
   static const Color divider = Color(0xFF38383A);
   
-  static const Color deepPurple = accentCrux; // Re-mapping to new palette
-  static const Color accentPink = accentRose; // Re-mapping
-  static const Color neonCyan = accentLuxe;   // Re-mapping
+  static const Color deepPurple = accentCrux; 
+  static const Color accentPink = accentRose; 
+  static const Color neonCyan = accentCyan; 
   static const Color textWhite = white;
   static const Color textGrey = silver;
   
   static const Color cardDark = titanium;
   static const Color background = primaryBlack;
-  static const Color error = accentRose;
+  static const Color error = Color(0xFFFF3B30);
   static const Color success = Color(0xFF32D74B); // iOS Green
   static const Color warning = accentLuxe;
-  static const Color accent = white;           // Primary accent is white/titanium
+  static const Color accent = white;
+  static const Color cardColor = titanium;
   
   // Radius
   static const double radiusMd = 12.0;
@@ -176,9 +190,19 @@ class AppTheme {
   static const double radiusXl = 24.0;
   static const double radiusFull = 100.0;
 
-  static const LinearGradient primaryGradient = LinearGradient(
-    colors: [accentCrux, Color(0xFF00C7BE)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
+  static const LinearGradient primaryGradient = accentGradient;
+}
+
+// Extension for Glassmorphism
+extension GlassEffect on BoxDecoration {
+  static BoxDecoration glass({double opacity = 0.1, double radius = 20}) {
+    return BoxDecoration(
+      color: Colors.white.withOpacity(opacity),
+      borderRadius: BorderRadius.circular(radius),
+      border: Border.all(
+        color: Colors.white.withOpacity(0.1),
+        width: 1,
+      ),
+    );
+  }
 }

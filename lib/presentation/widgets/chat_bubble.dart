@@ -21,23 +21,33 @@ class ChatBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: 24), // More breathing room
       child: Row(
         mainAxisAlignment:
             _isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          // AI Avatar (Optional, if we want it next to bubble)
+          if (!_isUser) ...[
+             // We can put a tiny avatar here if we want, but header has it.
+             // Leaving empty for now to focus on content.
+          ],
+
           // Message bubble
           Flexible(
             child: Container(
               constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.75,
+                maxWidth: MediaQuery.of(context).size.width * 0.80,
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: BoxDecoration(
-                // Gradient for User, Dark Card for AI
+                // Gradient for User, Dark Glass for AI
                 gradient: _isUser
-                    ? AppTheme.premiumGradient
+                    ? LinearGradient(
+                        colors: [accentColor, accentColor.withOpacity(0.7)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
                     : null,
                 color: _isUser
                     ? null
@@ -57,49 +67,64 @@ class ChatBubble extends StatelessWidget {
                 boxShadow: _isUser
                     ? [
                         BoxShadow(
-                          color: AppTheme.deepPurple.withOpacity(0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
+                          color: accentColor.withOpacity(0.3),
+                          blurRadius: 15,
+                          offset: const Offset(0, 5),
+                          spreadRadius: 1,
                         ),
                       ]
-                    : null,
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 5,
+                          offset: const Offset(0, 2),
+                        ),
+                    ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   // Message content
+                  // Message content
                   if (message.content.isNotEmpty)
                     MarkdownBody(
                       data: message.content,
                       styleSheet: MarkdownStyleSheet(
                         p: TextStyle(
-                          color: Colors.white.withOpacity(0.95),
+                          color: _isUser ? Colors.white : Colors.white.withOpacity(0.9),
                           fontSize: 16,
                           height: 1.5,
                           fontFamily: 'Inter',
+                          fontWeight: FontWeight.w400,
                         ),
                         code: TextStyle(
-                          color: accentColor,
+                          color: _isUser ? Colors.white : accentColor,
                           backgroundColor: Colors.black26, 
                           fontSize: 14,
                           fontFamily: 'monospace',
                         ),
                         codeblockDecoration: BoxDecoration(
                           color: Colors.black26,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        strong: const TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
-                        em: const TextStyle(fontStyle: FontStyle.italic, color: Colors.white70),
+                        blockquote: TextStyle(
+                           color: _isUser ? Colors.white70 : AppTheme.textMuted,
+                           fontStyle: FontStyle.italic,
+                        ),
+                        strong: TextStyle(fontWeight: FontWeight.bold, color: _isUser ? Colors.white : Colors.white),
                       ),
                     ),
 
                   // Timestamp
                   const SizedBox(height: 6),
-                  Text(
-                    '${message.timestamp.hour.toString().padLeft(2, '0')}:${message.timestamp.minute.toString().padLeft(2, '0')}',
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.white.withOpacity(0.5),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Text(
+                      '${message.timestamp.hour.toString().padLeft(2, '0')}:${message.timestamp.minute.toString().padLeft(2, '0')}',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 10,
+                        color: _isUser ? Colors.white.withOpacity(0.7) : AppTheme.textGrey,
+                      ),
                     ),
                   ),
                 ],
